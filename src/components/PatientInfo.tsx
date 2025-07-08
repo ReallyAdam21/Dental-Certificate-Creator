@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,13 +16,17 @@ interface PatientInfoProps {
   setPatientName: (name: string) => void;
   date: string;
   setDate: (date: string) => void;
+  title: string;
+  setTitle: (title: string) => void;
 }
 
 const PatientInfo: React.FC<PatientInfoProps> = ({
   patientName,
   setPatientName,
   date,
-  setDate
+  setDate,
+  title,
+  setTitle
 }) => {
   const [selectedDate, setSelectedDate] = React.useState<Date>();
 
@@ -54,7 +59,21 @@ const PatientInfo: React.FC<PatientInfoProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 md:space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+              Title
+            </Label>
+            <Select value={title} onValueChange={setTitle}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select title" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Mr.">Mr.</SelectItem>
+                <SelectItem value="Ms.">Ms.</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="patient-name" className="text-sm font-medium text-gray-700">
               Patient Name

@@ -190,7 +190,8 @@ export const generateCertificatePDF = async (
   date: string,
   services: any,
   otherDetails: string,
-  selectedTeeth: Set<string>
+  selectedTeeth: Set<string>,
+  title: string = 'Mr.'
 ) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
   
@@ -216,11 +217,11 @@ export const generateCertificatePDF = async (
   // Add underline for title
   pdf.line(40, 47, 170, 47);
   
-  // Date - Make inputted date bold and italic
+  // Date - Remove bold, keep normal font
   pdf.setFontSize(14);
   pdf.setFont('times', 'bold');
   pdf.text('Date:', 20, 60);
-  pdf.setFont('times', 'bolditalic');
+  pdf.setFont('times', 'normal');
   pdf.text(date, 42, 60);
   
   // Body text
@@ -228,17 +229,20 @@ export const generateCertificatePDF = async (
   pdf.setFont('times', 'normal');
   pdf.text('To Whom It May Concern:', 20, 75);
   
-  const bodyText1 = 'This is to certify that Mr./Ms. ';
-  const bodyText2 = ' has undergone dental treatment and';
-  const bodyText3 = 'received the following services:';
-  
+  // Updated patient name with title and better spacing
+  const bodyText1 = `This is to certify that ${title} `;
   pdf.text(bodyText1, 20, 85);
-  // Make patient name bold and italic
+  
+  // Make patient name bold and italic with extra spacing
+  const nameStartX = 20 + pdf.getTextWidth(bodyText1);
   pdf.setFont('times', 'bolditalic');
-  pdf.text(patientName, 20 + pdf.getTextWidth(bodyText1), 85);
+  pdf.text(patientName, nameStartX, 85);
+  
+  // Add extra space after name before continuing text
+  const nameEndX = nameStartX + pdf.getTextWidth(patientName) + 5; // +5 for extra space
   pdf.setFont('times', 'normal');
-  pdf.text(bodyText2, 20 + pdf.getTextWidth(bodyText1) + pdf.getTextWidth(patientName), 85);
-  pdf.text(bodyText3, 20, 95);
+  pdf.text('has undergone dental treatment and', nameEndX, 85);
+  pdf.text('received the following services:', 20, 95);
   
   // Services with checkboxes - larger font and better spacing
   let yPos = 105;
@@ -271,8 +275,8 @@ export const generateCertificatePDF = async (
   pdf.text('Tooth filling as indicated below:', 28, yPos);
   yPos += 12;
   
-  // Tooth grid - Change back to services.filling when working
-  if (services.filling) { // Changed back from true
+  // Tooth grid - Always show (as requested)
+  if (true) { // Always show tooth grid
     pdf.setFontSize(11); // Slightly larger tooth numbers
     pdf.setFont('times', 'normal');
     

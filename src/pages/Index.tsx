@@ -12,6 +12,7 @@ import { generateCertificatePDF } from '@/utils/pdfGenerator';
 const Index = () => {
   const { toast } = useToast();
   const [patientName, setPatientName] = useState('');
+  const [title, setTitle] = useState('Mr.');
   const [date, setDate] = useState('');
   const [services, setServices] = useState({
     scaling: false,
@@ -43,7 +44,8 @@ const Index = () => {
         date,
         services,
         otherDetails,
-        selectedTeeth
+        selectedTeeth,
+        title
       );
       
       toast({
@@ -93,6 +95,8 @@ const Index = () => {
               setPatientName={setPatientName}
               date={date}
               setDate={setDate}
+              title={title}
+              setTitle={setTitle}
             />
           </div>
 
