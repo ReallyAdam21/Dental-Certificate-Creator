@@ -89,6 +89,7 @@ const htmlTemplate = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+
     <div class="header">
         <h1>TANGLAO DENTAL CLINIC</h1>
         <div class="clinic-info">
@@ -99,18 +100,38 @@ const htmlTemplate = `<!DOCTYPE html>
     </div>
 
     <div class="section">
-        <strong>Date:</strong> <strong>{{DATE}}</strong>
+        <strong>Date:</strong> <strong>{{ date }}</strong>
         <p>To Whom It May Concern:</p>
-        <p>This is to certify that Mr./Ms. <strong>{{PATIENT_NAME}}</strong> has undergone dental treatment and received the following services:</p>
+        <p>This is to certify that Mr./Ms. <strong>{{ patient_name }}</strong> has undergone dental treatment and received the following services:</p>
 
-        <p><span class="checkbox">{{SCALING_CHECK}}</span> Thorough scaling and polishing</p>
-        <p><span class="checkbox">{{FILLING_CHECK}}</span> Tooth filling as indicated below:</p>
+        <p><span class="checkbox">{% if scaling %}✔{% endif %}</span> Thorough scaling and polishing</p>
+        <p><span class="checkbox">{% if filling %}✔{% endif %}</span> Tooth filling as indicated below:</p>
 
-        {{TOOTH_GRID}}
+        {% if filling %}
+        <div class="tooth-grid">
+            <!-- Upper Row -->
+            {% for tooth in ["18","17","16","15","14","13","12","11"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+            <span style="margin: 0 12px;">:</span>
+            {% for tooth in ["21","22","23","24","25","26","27","28"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+            <br>
+            <!-- Lower Row -->
+            {% for tooth in ["48","47","46","45","44","43","42","41"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+            <span style="margin: 0 12px;">:</span>
+            {% for tooth in ["31","32","33","34","35","36","37","38"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
 
-        <p><span class="checkbox">{{GINGIVAL_CHECK}}</span> Gingival / Periodontal Treatment</p>
-        <p><span class="checkbox">{{EXTRACTION_CHECK}}</span> Tooth Extraction</p>
-        <p><span class="checkbox">{{OTHERS_CHECK}}</span> Others: <strong><em>{{OTHER_DETAILS}}</em></strong></p>
+        <p><span class="checkbox">{% if gingival %}✔{% endif %}</span> Gingival / Periodontal Treatment</p>
+        <p><span class="checkbox">{% if extraction %}✔{% endif %}</span> Tooth Extraction</p>
+        <p><span class="checkbox">{% if others %}✔{% endif %}</span> Others: <strong><em>{{ other_details }}</em></strong></p>
 
         <p>This certification is issued upon the request of the above-named patient for whatever purpose it may serve.</p>
         <br><br><br><br><br><br><br><br>
@@ -173,15 +194,52 @@ export const generateCertificatePDF = async (
 ) => {
   // Replace template variables
   let html = htmlTemplate
-    .replace('{{DATE}}', date)
-    .replace('{{PATIENT_NAME}}', patientName)
-    .replace('{{SCALING_CHECK}}', services.scaling ? '✔' : '')
-    .replace('{{FILLING_CHECK}}', services.filling ? '✔' : '')
-    .replace('{{GINGIVAL_CHECK}}', services.gingival ? '✔' : '')
-    .replace('{{EXTRACTION_CHECK}}', services.extraction ? '✔' : '')
-    .replace('{{OTHERS_CHECK}}', services.others ? '✔' : '')
-    .replace('{{OTHER_DETAILS}}', services.others ? otherDetails : '')
-    .replace('{{TOOTH_GRID}}', generateToothGrid(selectedTeeth, services.filling));
+    .replace('{{ date }}', date)
+    .replace('{{ patient_name }}', patientName)
+    .replace('{% if scaling %}✔{% endif %}', services.scaling ? '✔' : '')
+    .replace('{% if filling %}✔{% endif %}', services.filling ? '✔' : '')
+    .replace('{% if gingival %}✔{% endif %}', services.gingival ? '✔' : '')
+    .replace('{% if extraction %}✔{% endif %}', services.extraction ? '✔' : '')
+    .replace('{% if others %}✔{% endif %}', services.others ? '✔' : '')
+    .replace('{{ other_details }}', services.others ? otherDetails : '');
+
+  // Handle tooth grid conditional display and loops
+  if (services.filling) {
+    const upperTeeth = ["18", "17", "16", "15", "14", "13", "12", "11"];
+    const upperTeethRight = ["21", "22", "23", "24", "25", "26", "27", "28"];
+    const lowerTeeth = ["48", "47", "46", "45", "44", "43", "42", "41"];
+    const lowerTeethRight = ["31", "32", "33", "34", "35", "36", "37", "38"];
+
+    // Generate upper row
+    const upperRowHtml = upperTeeth.map(tooth => 
+      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+    ).join('');
+    
+    const upperRightRowHtml = upperTeethRight.map(tooth => 
+      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+    ).join('');
+
+    // Generate lower row
+    const lowerRowHtml = lowerTeeth.map(tooth => 
+      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+    ).join('');
+    
+    const lowerRightRowHtml = lowerTeethRight.map(tooth => 
+      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+    ).join('');
+
+    // Replace the Jinja loops with actual HTML
+    html = html
+      .replace('{% if filling %}', '')
+      .replace('{% endif %}', '')
+      .replace(/{% for tooth in \["18","17","16","15","14","13","12","11"\] %}[\s\S]*?{% endfor %}/g, upperRowHtml)
+      .replace(/{% for tooth in \["21","22","23","24","25","26","27","28"\] %}[\s\S]*?{% endfor %}/g, upperRightRowHtml)
+      .replace(/{% for tooth in \["48","47","46","45","44","43","42","41"\] %}[\s\S]*?{% endfor %}/g, lowerRowHtml)
+      .replace(/{% for tooth in \["31","32","33","34","35","36","37","38"\] %}[\s\S]*?{% endfor %}/g, lowerRightRowHtml);
+  } else {
+    // Remove the entire tooth grid section if filling is not selected
+    html = html.replace(/{% if filling %}[\s\S]*?{% endif %}/g, '');
+  }
 
   // Create a temporary div to render the HTML
   const tempDiv = document.createElement('div');
