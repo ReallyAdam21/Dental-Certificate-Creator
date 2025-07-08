@@ -30,40 +30,40 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full h-fit">
       <CardHeader>
-        <CardTitle className="text-xl text-blue-800 flex items-center gap-2">
+        <CardTitle className="text-lg md:text-xl text-blue-800 flex items-center gap-2">
           <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-bold">3</span>
           </div>
           Tooth Selection for Filling
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex justify-between items-center">
+      <CardContent className="space-y-4 md:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <p className="text-sm text-gray-600">Click on teeth to select/deselect</p>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={clearSelection}
-            className="text-xs"
+            className="text-xs self-start sm:self-auto"
           >
             Clear All
           </Button>
         </div>
         
-        <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-100">
+        <div className="bg-blue-50 p-3 md:p-6 rounded-lg border-2 border-blue-100">
           {/* Upper Teeth */}
-          <div className="mb-6">
-            <div className="text-sm font-medium text-gray-700 mb-3 text-center">Upper Teeth</div>
-            <div className="grid grid-cols-8 gap-1 sm:gap-2 justify-center max-w-2xl mx-auto">
+          <div className="mb-4 md:mb-6">
+            <div className="text-sm font-medium text-gray-700 mb-2 md:mb-3 text-center">Upper Teeth</div>
+            <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-2">
               {upperTeeth.slice(0, 8).map((tooth) => (
                 <Button
                   key={tooth}
                   variant={selectedTeeth.has(tooth) ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleTooth(tooth)}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 text-xs font-bold transition-all duration-200 ${
+                  className={`w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-xs font-bold transition-all duration-200 ${
                     selectedTeeth.has(tooth) 
                       ? 'bg-green-500 hover:bg-green-600 text-white shadow-md transform scale-105' 
                       : 'hover:bg-blue-100 hover:border-blue-300'
@@ -73,15 +73,15 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
                 </Button>
               ))}
             </div>
-            <div className="text-center my-2 text-gray-400 text-sm">|</div>
-            <div className="grid grid-cols-8 gap-1 sm:gap-2 justify-center max-w-2xl mx-auto">
+            <div className="text-center text-gray-400 text-sm">|</div>
+            <div className="flex flex-wrap justify-center gap-1 md:gap-2 mt-2">
               {upperTeeth.slice(8).map((tooth) => (
                 <Button
                   key={tooth}
                   variant={selectedTeeth.has(tooth) ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleTooth(tooth)}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 text-xs font-bold transition-all duration-200 ${
+                  className={`w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-xs font-bold transition-all duration-200 ${
                     selectedTeeth.has(tooth) 
                       ? 'bg-green-500 hover:bg-green-600 text-white shadow-md transform scale-105' 
                       : 'hover:bg-blue-100 hover:border-blue-300'
@@ -95,15 +95,15 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
 
           {/* Lower Teeth */}
           <div>
-            <div className="text-sm font-medium text-gray-700 mb-3 text-center">Lower Teeth</div>
-            <div className="grid grid-cols-8 gap-1 sm:gap-2 justify-center max-w-2xl mx-auto">
+            <div className="text-sm font-medium text-gray-700 mb-2 md:mb-3 text-center">Lower Teeth</div>
+            <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-2">
               {lowerTeeth.slice(0, 8).map((tooth) => (
                 <Button
                   key={tooth}
                   variant={selectedTeeth.has(tooth) ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleTooth(tooth)}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 text-xs font-bold transition-all duration-200 ${
+                  className={`w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-xs font-bold transition-all duration-200 ${
                     selectedTeeth.has(tooth) 
                       ? 'bg-green-500 hover:bg-green-600 text-white shadow-md transform scale-105' 
                       : 'hover:bg-blue-100 hover:border-blue-300'
@@ -113,15 +113,15 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
                 </Button>
               ))}
             </div>
-            <div className="text-center my-2 text-gray-400 text-sm">|</div>
-            <div className="grid grid-cols-8 gap-1 sm:gap-2 justify-center max-w-2xl mx-auto">
+            <div className="text-center text-gray-400 text-sm">|</div>
+            <div className="flex flex-wrap justify-center gap-1 md:gap-2 mt-2">
               {lowerTeeth.slice(8).map((tooth) => (
                 <Button
                   key={tooth}
                   variant={selectedTeeth.has(tooth) ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleTooth(tooth)}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 text-xs font-bold transition-all duration-200 ${
+                  className={`w-7 h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-xs font-bold transition-all duration-200 ${
                     selectedTeeth.has(tooth) 
                       ? 'bg-green-500 hover:bg-green-600 text-white shadow-md transform scale-105' 
                       : 'hover:bg-blue-100 hover:border-blue-300'
@@ -136,7 +136,7 @@ const ToothSelector: React.FC<ToothSelectorProps> = ({
         
         {selectedTeeth.size > 0 && (
           <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-            <p className="text-sm font-medium text-green-800">
+            <p className="text-sm font-medium text-green-800 break-words">
               Selected teeth: {Array.from(selectedTeeth).sort().join(', ')}
             </p>
           </div>

@@ -36,9 +36,9 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full h-fit">
       <CardHeader>
-        <CardTitle className="text-xl text-blue-800 flex items-center gap-2">
+        <CardTitle className="text-lg md:text-xl text-blue-800 flex items-center gap-2">
           <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-bold">2</span>
           </div>
@@ -46,21 +46,23 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {serviceOptions.map((option) => (
-          <div key={option.key} className="flex items-center space-x-3">
-            <Checkbox
-              id={option.key}
-              checked={services[option.key as keyof typeof services]}
-              onCheckedChange={(checked) => handleServiceChange(option.key, checked as boolean)}
-            />
-            <Label 
-              htmlFor={option.key} 
-              className="text-sm font-medium text-gray-700 cursor-pointer"
-            >
-              {option.label}
-            </Label>
-          </div>
-        ))}
+        <div className="grid grid-cols-1 gap-3 md:gap-4">
+          {serviceOptions.map((option) => (
+            <div key={option.key} className="flex items-center space-x-3">
+              <Checkbox
+                id={option.key}
+                checked={services[option.key as keyof typeof services]}
+                onCheckedChange={(checked) => handleServiceChange(option.key, checked as boolean)}
+              />
+              <Label 
+                htmlFor={option.key} 
+                className="text-sm font-medium text-gray-700 cursor-pointer leading-relaxed"
+              >
+                {option.label}
+              </Label>
+            </div>
+          ))}
+        </div>
         
         <div className="space-y-3">
           <div className="flex items-center space-x-3">
@@ -74,13 +76,15 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
             </Label>
           </div>
           {services.others && (
-            <Input
-              type="text"
-              placeholder="Specify other services..."
-              value={otherDetails}
-              onChange={(e) => setOtherDetails(e.target.value)}
-              className="ml-6 w-full"
-            />
+            <div className="ml-6">
+              <Input
+                type="text"
+                placeholder="Specify other services..."
+                value={otherDetails}
+                onChange={(e) => setOtherDetails(e.target.value)}
+                className="w-full"
+              />
+            </div>
           )}
         </div>
       </CardContent>

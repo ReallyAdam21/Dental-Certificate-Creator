@@ -63,28 +63,28 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-blue-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-3">
+      <header className="bg-white shadow-sm border-b border-blue-100">
+        <div className="container mx-auto px-4 py-4 md:py-6">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="p-2 bg-blue-600 rounded-lg">
-              <Stethoscope className="w-8 h-8 text-white" />
+              <Stethoscope className="w-6 h-6 md:w-8 md:h-8 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-blue-900">
+            <div className="text-center sm:text-left">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-blue-900">
                 Dental Certificate Generator
               </h1>
-              <p className="text-blue-600 text-sm sm:text-base">
+              <p className="text-blue-600 text-sm md:text-base">
                 Create professional dental certificates with ease
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Patient Information */}
+      <main className="container mx-auto px-4 py-6 md:py-8">
+        <div className="grid grid-cols-1 gap-6 md:gap-8 max-w-7xl mx-auto">
+          {/* Patient Information - Full Width */}
           <div className="animate-in slide-in-from-left duration-500">
             <PatientInfo
               patientName={patientName}
@@ -94,8 +94,8 @@ const Index = () => {
             />
           </div>
 
-          {/* Services Grid */}
-          <div className="grid lg:grid-cols-2 gap-8">
+          {/* Services and Tooth Selection Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
             <div className="animate-in slide-in-from-left duration-500 delay-150">
               <ServiceSelection
                 services={services}
@@ -118,21 +118,21 @@ const Index = () => {
             <Button
               onClick={handleGenerateCertificate}
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
-              <FileText className="w-5 h-5 mr-2" />
+              <FileText className="w-4 h-4 md:w-5 md:h-5 mr-2" />
               Generate Certificate
-              <Download className="w-5 h-5 ml-2" />
+              <Download className="w-4 h-4 md:w-5 md:h-5 ml-2" />
             </Button>
           </div>
 
           {/* Info Card */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 animate-in fade-in duration-500 delay-700">
-            <div className="flex items-start gap-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 md:p-6 animate-in fade-in duration-500 delay-700">
+            <div className="flex flex-col sm:flex-row items-start gap-3">
               <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-white text-xs font-bold">i</span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1">
                 <h3 className="font-semibold text-blue-900">How it works</h3>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• Fill in patient information and select services provided</li>
@@ -144,7 +144,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
