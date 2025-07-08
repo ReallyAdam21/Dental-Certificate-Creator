@@ -200,38 +200,40 @@ export const generateCertificatePDF = async (
   html = html.replace(/{{ patient_name }}/g, patientName);
   html = html.replace(/{{ other_details }}/g, services.others ? otherDetails : '');
   
-  // Process conditional checkboxes
-  html = html.replace(/{% if scaling %}✔{% endif %}/g, services.scaling ? '✔' : '');
-  html = html.replace(/{% if filling %}✔{% endif %}/g, services.filling ? '✔' : '');
-  html = html.replace(/{% if gingival %}✔{% endif %}/g, services.gingival ? '✔' : '');
-  html = html.replace(/{% if extraction %}✔{% endif %}/g, services.extraction ? '✔' : '');
-  html = html.replace(/{% if others %}✔{% endif %}/g, services.others ? '✔' : '');
+  // Process conditional checkboxes - use proper checkmark symbol
+  html = html.replace(/{% if scaling %}✔{% endif %}/g, services.scaling ? '✓' : '');
+  html = html.replace(/{% if filling %}✔{% endif %}/g, services.filling ? '✓' : '');
+  html = html.replace(/{% if gingival %}✔{% endif %}/g, services.gingival ? '✓' : '');
+  html = html.replace(/{% if extraction %}✔{% endif %}/g, services.extraction ? '✓' : '');
+  html = html.replace(/{% if others %}✔{% endif %}/g, services.others ? '✓' : '');
   
   // Process the conditional tooth grid block
   if (services.filling) {
-    // Process each for loop in the tooth grid
-    const teethArrays = [
-      ["18","17","16","15","14","13","12","11"],
-      ["21","22","23","24","25","26","27","28"],
-      ["48","47","46","45","44","43","42","41"],
-      ["31","32","33","34","35","36","37","38"]
-    ];
+    // Generate the tooth grid HTML manually to ensure proper formatting
+    const upperLeft = ["18", "17", "16", "15", "14", "13", "12", "11"];
+    const upperRight = ["21", "22", "23", "24", "25", "26", "27", "28"];
+    const lowerLeft = ["48", "47", "46", "45", "44", "43", "42", "41"];
+    const lowerRight = ["31", "32", "33", "34", "35", "36", "37", "38"];
     
-    teethArrays.forEach(teethArray => {
-      const teethPattern = teethArray.map(t => `"${t}"`).join(',');
-      const forLoopRegex = new RegExp(`{% for tooth in \\[${teethPattern}\\] %}[\\s\\S]*?{% endfor %}`, 'g');
-      
-      const replacement = teethArray.map(tooth => {
-        const highlightClass = selectedTeeth.has(tooth) ? ' highlight' : '';
-        return `<span class="tooth-number${highlightClass}">${tooth}</span>`;
-      }).join('');
-      
-      html = html.replace(forLoopRegex, replacement);
-    });
+    const generateToothRow = (teeth: string[], hasColon = false) => {
+      return teeth.map(tooth => {
+        const isSelected = selectedTeeth.has(tooth);
+        const className = isSelected ? 'tooth-number highlight' : 'tooth-number';
+        return `<span class="${className}">${tooth}</span>`;
+      }).join('') + (hasColon ? '<span style="margin: 0 12px;">:</span>' : '');
+    };
     
-    // Remove the conditional filling wrapper
-    html = html.replace(/{% if filling %}/g, '');
-    html = html.replace(/{% endif %}/g, '');
+    const toothGridHtml = `
+        <div class="tooth-grid">
+            <!-- Upper Row -->
+            ${generateToothRow(upperLeft, true)}${generateToothRow(upperRight)}
+            <br>
+            <!-- Lower Row -->
+            ${generateToothRow(lowerLeft, true)}${generateToothRow(lowerRight)}
+        </div>`;
+    
+    // Replace the entire conditional block with the generated HTML
+    html = html.replace(/{% if filling %}[\s\S]*?{% endif %}/g, toothGridHtml);
   } else {
     // Remove the entire tooth grid section if filling is not selected
     html = html.replace(/{% if filling %}[\s\S]*?{% endif %}/g, '');
