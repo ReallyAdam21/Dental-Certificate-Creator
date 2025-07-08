@@ -7,7 +7,7 @@ import PatientInfo from '@/components/PatientInfo';
 import ServiceSelection from '@/components/ServiceSelection';
 import ToothSelector from '@/components/ToothSelector';
 import { validateForm } from '@/utils/validation';
-import { generateCertificateData, downloadJSON } from '@/utils/pdfGenerator';
+import { generateCertificatePDF } from '@/utils/pdfGenerator';
 
 const Index = () => {
   const { toast } = useToast();
@@ -22,8 +22,9 @@ const Index = () => {
   });
   const [otherDetails, setOtherDetails] = useState('');
   const [selectedTeeth, setSelectedTeeth] = useState<Set<string>>(new Set());
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerateCertificate = () => {
+  const handleGenerateCertificate = async () => {
     const validation = validateForm(patientName, date, services, selectedTeeth);
     
     if (!validation.isValid) {
@@ -35,8 +36,9 @@ const Index = () => {
       return;
     }
 
+    setIsGenerating(true);
     try {
-      const certificateData = generateCertificateData(
+      await generateCertificatePDF(
         patientName,
         date,
         services,
@@ -44,19 +46,19 @@ const Index = () => {
         selectedTeeth
       );
       
-      const filename = `${patientName.replace(/\s+/g, '_')}_Dental_Certificate.json`;
-      downloadJSON(certificateData, filename);
-      
       toast({
         title: "Success!",
-        description: "Certificate data has been generated and downloaded.",
+        description: "Certificate PDF has been generated and downloaded.",
       });
     } catch (error) {
+      console.error('PDF generation error:', error);
       toast({
         title: "Error",
-        description: "Failed to generate certificate. Please try again.",
+        description: "Failed to generate PDF. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -117,11 +119,12 @@ const Index = () => {
           <div className="flex justify-center animate-in slide-in-from-bottom duration-500 delay-500">
             <Button
               onClick={handleGenerateCertificate}
+              disabled={isGenerating}
               size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <FileText className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-              Generate Certificate
+              {isGenerating ? 'Generating PDF...' : 'Generate PDF Certificate'}
               <Download className="w-4 h-4 md:w-5 md:h-5 ml-2" />
             </Button>
           </div>
@@ -137,8 +140,8 @@ const Index = () => {
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• Fill in patient information and select services provided</li>
                   <li>• For tooth filling, click on the specific teeth to select them</li>
-                  <li>• Click "Generate Certificate" to download the certificate data</li>
-                  <li>• The data can be used with your PDF generation system</li>
+                  <li>• Click "Generate PDF Certificate" to create and download the PDF</li>
+                  <li>• The PDF will match the official dental certificate format</li>
                 </ul>
               </div>
             </div>
