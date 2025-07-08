@@ -198,39 +198,50 @@ export const generateCertificatePDF = async (
   pdf.setFont('times', 'normal');
   
   // Header - Clinic Name
-  pdf.setFontSize(16);
+  pdf.setFontSize(18);
   pdf.setFont('times', 'bold');
-  pdf.text('TANGLAO DENTAL CLINIC', 105, 25, { align: 'center' });
+  pdf.text('TANGLAO DENTAL CLINIC', 105, 20, { align: 'center' });
   
   // Clinic Info
-  pdf.setFontSize(10);
+  pdf.setFontSize(12);
   pdf.setFont('times', 'normal');
-  pdf.text('MacArthur Hi-Way, Sto. Domingo I, Capas, Tarlac', 105, 32, { align: 'center' });
-  pdf.text('Tel. No.: 045-493-3454 | Cell No.: 0928-9950-488', 105, 38, { align: 'center' });
+  pdf.text('MacArthur Hi-Way, Sto. Domingo I, Capas, Tarlac', 105, 28, { align: 'center' });
+  pdf.text('Tel. No.: 045-493-3454 | Cell No.: 0928-9950-488', 105, 34, { align: 'center' });
   
   // Title
-  pdf.setFontSize(14);
+  pdf.setFontSize(16);
   pdf.setFont('times', 'bold');
-  pdf.text('CERTIFICATE OF DENTAL TREATMENT', 105, 50, { align: 'center' });
+  pdf.text('CERTIFICATE OF DENTAL TREATMENT', 105, 45, { align: 'center' });
   
   // Add underline for title
-  pdf.line(50, 52, 160, 52);
+  pdf.line(40, 47, 170, 47);
   
-  // Date
-  pdf.setFontSize(12);
+  // Date - Make inputted date bold and italic
+  pdf.setFontSize(14);
   pdf.setFont('times', 'bold');
-  pdf.text(`Date: ${date}`, 20, 70);
+  pdf.text('Date:', 20, 60);
+  pdf.setFont('times', 'bolditalic');
+  pdf.text(date, 42, 60);
   
   // Body text
+  pdf.setFontSize(13);
   pdf.setFont('times', 'normal');
-  pdf.text('To Whom It May Concern:', 20, 80);
+  pdf.text('To Whom It May Concern:', 20, 75);
   
-  const bodyText = `This is to certify that Mr./Ms. ${patientName} has undergone dental treatment and received the following services:`;
-  const splitBody = pdf.splitTextToSize(bodyText, 170);
-  pdf.text(splitBody, 20, 90);
+  const bodyText1 = 'This is to certify that Mr./Ms. ';
+  const bodyText2 = ' has undergone dental treatment and';
+  const bodyText3 = 'received the following services:';
   
-  // Services with checkboxes
-  let yPos = 110;
+  pdf.text(bodyText1, 20, 85);
+  // Make patient name bold and italic
+  pdf.setFont('times', 'bolditalic');
+  pdf.text(patientName, 20 + pdf.getTextWidth(bodyText1), 85);
+  pdf.setFont('times', 'normal');
+  pdf.text(bodyText2, 20 + pdf.getTextWidth(bodyText1) + pdf.getTextWidth(patientName), 85);
+  pdf.text(bodyText3, 20, 95);
+  
+  // Services with checkboxes - larger font and better spacing
+  let yPos = 105;
   
   // Helper function to draw checkbox
   const drawCheckbox = (x: number, y: number, checked: boolean) => {
@@ -246,19 +257,23 @@ export const generateCertificatePDF = async (
     }
   };
   
+  // Set service text font size
+  pdf.setFontSize(13);
+  
   // Thorough scaling and polishing
   drawCheckbox(20, yPos, services.scaling);
+  pdf.setFont('times', 'normal');
   pdf.text('Thorough scaling and polishing', 28, yPos);
-  yPos += 8;
+  yPos += 10;
   
   // Tooth filling
   drawCheckbox(20, yPos, services.filling);
   pdf.text('Tooth filling as indicated below:', 28, yPos);
-  yPos += 10;
+  yPos += 12;
   
-  // Tooth grid - Force display for debugging (change back to services.filling when working)
-  if (true) { // Change this back to: if (services.filling) {
-    pdf.setFontSize(10);
+  // Tooth grid - Change back to services.filling when working
+  if (services.filling) { // Changed back from true
+    pdf.setFontSize(11); // Slightly larger tooth numbers
     pdf.setFont('times', 'normal');
     
     // Upper teeth: 18-11 : 21-28
@@ -347,24 +362,29 @@ export const generateCertificatePDF = async (
     yPos += 5;
   }
   
-  // Reset font
+  // Reset font and continue with services
+  pdf.setFontSize(13);
   pdf.setFont('times', 'normal');
   
   // Gingival / Periodontal Treatment
   drawCheckbox(20, yPos, services.gingival);
   pdf.text('Gingival / Periodontal Treatment', 28, yPos);
-  yPos += 8;
+  yPos += 10;
   
   // Tooth Extraction
   drawCheckbox(20, yPos, services.extraction);
   pdf.text('Tooth Extraction', 28, yPos);
-  yPos += 8;
+  yPos += 10;
   
-  // Others
+  // Others - make inputted text bold and italic
   drawCheckbox(20, yPos, services.others);
-  const othersText = services.others ? `Others: ${otherDetails}` : 'Others:';
-  pdf.text(othersText, 28, yPos);
-  yPos += 15;
+  pdf.text('Others:', 28, yPos);
+  if (services.others && otherDetails) {
+    const othersWidth = pdf.getTextWidth('Others: ');
+    pdf.setFont('times', 'bolditalic');
+    pdf.text(otherDetails, 28 + othersWidth, yPos);
+  }
+  yPos += 20;
   
   // Closing text
   const closingText = 'This certification is issued upon the request of the above-named patient for whatever purpose it may serve.';
