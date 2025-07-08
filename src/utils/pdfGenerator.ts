@@ -270,38 +270,39 @@ export const generateCertificatePDF = async (
     const lowerRight = ["31", "32", "33", "34", "35", "36", "37", "38"];
     
     // Draw upper teeth row
-    let startX = 35;
+    let startX = 20; // Move further left to fit all teeth
     let currentX = startX;
+    const toothSpacing = 8; // Reduce spacing to fit all teeth
     
     // Upper left teeth (18-11)
     upperLeft.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
         pdf.setFillColor(200, 255, 200); // Light green background
-        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
+        pdf.rect(currentX - 1, yPos - 3, 10, 6, 'F');
         pdf.setFont('times', 'bold');
       } else {
         pdf.setFont('times', 'normal');
       }
-      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
-      currentX += 16;
+      pdf.text(tooth, currentX + 4, yPos, { align: 'center' });
+      currentX += toothSpacing;
     });
     
     // Colon separator
     pdf.setFont('times', 'normal');
     pdf.text(':', currentX + 2, yPos);
-    currentX += 12;
+    currentX += 8; // Smaller gap for colon
     
     // Upper right teeth (21-28)
     upperRight.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
         pdf.setFillColor(200, 255, 200); // Light green background
-        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
+        pdf.rect(currentX - 1, yPos - 3, 10, 6, 'F');
         pdf.setFont('times', 'bold');
       } else {
         pdf.setFont('times', 'normal');
       }
-      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
-      currentX += 16;
+      pdf.text(tooth, currentX + 4, yPos, { align: 'center' });
+      currentX += toothSpacing;
     });
     
     yPos += 12;
@@ -313,31 +314,31 @@ export const generateCertificatePDF = async (
     lowerLeft.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
         pdf.setFillColor(200, 255, 200); // Light green background
-        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
+        pdf.rect(currentX - 1, yPos - 3, 10, 6, 'F');
         pdf.setFont('times', 'bold');
       } else {
         pdf.setFont('times', 'normal');
       }
-      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
-      currentX += 16;
+      pdf.text(tooth, currentX + 4, yPos, { align: 'center' });
+      currentX += toothSpacing;
     });
     
     // Colon separator
     pdf.setFont('times', 'normal');
     pdf.text(':', currentX + 2, yPos);
-    currentX += 12;
+    currentX += 8; // Smaller gap for colon
     
     // Lower right teeth (31-38)
     lowerRight.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
         pdf.setFillColor(200, 255, 200); // Light green background
-        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
+        pdf.rect(currentX - 1, yPos - 3, 10, 6, 'F');
         pdf.setFont('times', 'bold');
       } else {
         pdf.setFont('times', 'normal');
       }
-      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
-      currentX += 16;
+      pdf.text(tooth, currentX + 4, yPos, { align: 'center' });
+      currentX += toothSpacing;
     });
     
     yPos += 20;
