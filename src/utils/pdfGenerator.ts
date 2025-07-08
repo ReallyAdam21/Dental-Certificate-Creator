@@ -192,89 +192,158 @@ export const generateCertificatePDF = async (
   otherDetails: string,
   selectedTeeth: Set<string>
 ) => {
-  // Process the Jinja-style template
-  let html = htmlTemplate;
+  const pdf = new jsPDF('p', 'mm', 'a4');
   
-  // Replace simple variables first
-  html = html.replace(/{{ date }}/g, date);
-  html = html.replace(/{{ patient_name }}/g, patientName);
-  html = html.replace(/{{ other_details }}/g, services.others ? otherDetails : '');
+  // Set font
+  pdf.setFont('times', 'normal');
   
-  // Process conditional checkboxes - use proper checkmark symbol
-  html = html.replace(/{% if scaling %}✔{% endif %}/g, services.scaling ? '✓' : '');
-  html = html.replace(/{% if filling %}✔{% endif %}/g, services.filling ? '✓' : '');
-  html = html.replace(/{% if gingival %}✔{% endif %}/g, services.gingival ? '✓' : '');
-  html = html.replace(/{% if extraction %}✔{% endif %}/g, services.extraction ? '✓' : '');
-  html = html.replace(/{% if others %}✔{% endif %}/g, services.others ? '✓' : '');
+  // Header - Clinic Name
+  pdf.setFontSize(16);
+  pdf.setFont('times', 'bold');
+  pdf.text('TANGLAO DENTAL CLINIC', 105, 25, { align: 'center' });
   
-  // Process the conditional tooth grid block
+  // Clinic Info
+  pdf.setFontSize(10);
+  pdf.setFont('times', 'normal');
+  pdf.text('MacArthur Hi-Way, Sto. Domingo I, Capas, Tarlac', 105, 32, { align: 'center' });
+  pdf.text('Tel. No.: 045-493-3454 | Cell No.: 0928-9950-488', 105, 38, { align: 'center' });
+  
+  // Title
+  pdf.setFontSize(14);
+  pdf.setFont('times', 'bold');
+  pdf.text('CERTIFICATE OF DENTAL TREATMENT', 105, 50, { align: 'center' });
+  
+  // Add underline for title
+  pdf.line(50, 52, 160, 52);
+  
+  // Date
+  pdf.setFontSize(12);
+  pdf.setFont('times', 'bold');
+  pdf.text(`Date: ${date}`, 20, 70);
+  
+  // Body text
+  pdf.setFont('times', 'normal');
+  pdf.text('To Whom It May Concern:', 20, 80);
+  
+  const bodyText = `This is to certify that Mr./Ms. ${patientName} has undergone dental treatment and received the following services:`;
+  const splitBody = pdf.splitTextToSize(bodyText, 170);
+  pdf.text(splitBody, 20, 90);
+  
+  // Services with checkboxes
+  let yPos = 110;
+  
+  // Helper function to draw checkbox
+  const drawCheckbox = (x: number, y: number, checked: boolean) => {
+    // Draw square
+    pdf.rect(x, y - 3, 4, 4);
+    if (checked) {
+      pdf.text('✓', x + 2, y, { align: 'center' });
+    }
+  };
+  
+  // Thorough scaling and polishing
+  drawCheckbox(20, yPos, services.scaling);
+  pdf.text('Thorough scaling and polishing', 28, yPos);
+  yPos += 8;
+  
+  // Tooth filling
+  drawCheckbox(20, yPos, services.filling);
+  pdf.text('Tooth filling as indicated below:', 28, yPos);
+  yPos += 10;
+  
+  // Tooth grid (only if filling is selected)
   if (services.filling) {
-    // Generate the tooth grid HTML manually to ensure proper formatting
-    const upperLeft = ["18", "17", "16", "15", "14", "13", "12", "11"];
-    const upperRight = ["21", "22", "23", "24", "25", "26", "27", "28"];
-    const lowerLeft = ["48", "47", "46", "45", "44", "43", "42", "41"];
-    const lowerRight = ["31", "32", "33", "34", "35", "36", "37", "38"];
+    const upperTeeth = ["18", "17", "16", "15", "14", "13", "12", "11", ":", "21", "22", "23", "24", "25", "26", "27", "28"];
+    const lowerTeeth = ["48", "47", "46", "45", "44", "43", "42", "41", ":", "31", "32", "33", "34", "35", "36", "37", "38"];
     
-    const generateToothRow = (teeth: string[], hasColon = false) => {
-      return teeth.map(tooth => {
-        const isSelected = selectedTeeth.has(tooth);
-        const className = isSelected ? 'tooth-number highlight' : 'tooth-number';
-        return `<span class="${className}">${tooth}</span>`;
-      }).join('') + (hasColon ? '<span style="margin: 0 12px;">:</span>' : '');
-    };
-    
-    const toothGridHtml = `
-        <div class="tooth-grid">
-            <!-- Upper Row -->
-            ${generateToothRow(upperLeft, true)}${generateToothRow(upperRight)}
-            <br>
-            <!-- Lower Row -->
-            ${generateToothRow(lowerLeft, true)}${generateToothRow(lowerRight)}
-        </div>`;
-    
-    // Replace the entire conditional block with the generated HTML
-    html = html.replace(/{% if filling %}[\s\S]*?{% endif %}/g, toothGridHtml);
-  } else {
-    // Remove the entire tooth grid section if filling is not selected
-    html = html.replace(/{% if filling %}[\s\S]*?{% endif %}/g, '');
-  }
-
-  // Create a temporary div to render the HTML
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = html;
-  tempDiv.style.position = 'absolute';
-  tempDiv.style.left = '-9999px';
-  tempDiv.style.top = '-9999px';
-  tempDiv.style.width = '210mm'; // A4 width
-  tempDiv.style.background = 'white';
-  document.body.appendChild(tempDiv);
-
-  try {
-    // Convert HTML to canvas
-    const canvas = await html2canvas(tempDiv, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff'
+    // Draw upper teeth
+    let xPos = 30;
+    upperTeeth.forEach(tooth => {
+      if (tooth === ":") {
+        pdf.text(":", xPos, yPos);
+        xPos += 8;
+      } else {
+        if (selectedTeeth.has(tooth)) {
+          // Highlight selected teeth with background
+          pdf.setFillColor(198, 245, 198); // Light green
+          pdf.rect(xPos - 2, yPos - 5, 12, 6, 'F');
+          pdf.setFont('times', 'bold');
+        } else {
+          pdf.setFont('times', 'normal');
+        }
+        pdf.text(tooth, xPos + 3, yPos, { align: 'center' });
+        xPos += 12;
+      }
     });
-
-    // Create PDF
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const imgData = canvas.toDataURL('image/png');
     
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    yPos += 10;
     
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    // Draw lower teeth
+    xPos = 30;
+    lowerTeeth.forEach(tooth => {
+      if (tooth === ":") {
+        pdf.text(":", xPos, yPos);
+        xPos += 8;
+      } else {
+        if (selectedTeeth.has(tooth)) {
+          // Highlight selected teeth with background
+          pdf.setFillColor(198, 245, 198); // Light green
+          pdf.rect(xPos - 2, yPos - 5, 12, 6, 'F');
+          pdf.setFont('times', 'bold');
+        } else {
+          pdf.setFont('times', 'normal');
+        }
+        pdf.text(tooth, xPos + 3, yPos, { align: 'center' });
+        xPos += 12;
+      }
+    });
     
-    // Download the PDF
-    const filename = `${patientName.replace(/\s+/g, '_')}_Dental_Certificate.pdf`;
-    pdf.save(filename);
-    
-  } finally {
-    // Clean up
-    document.body.removeChild(tempDiv);
+    yPos += 15;
   }
+  
+  // Reset font
+  pdf.setFont('times', 'normal');
+  
+  // Gingival / Periodontal Treatment
+  drawCheckbox(20, yPos, services.gingival);
+  pdf.text('Gingival / Periodontal Treatment', 28, yPos);
+  yPos += 8;
+  
+  // Tooth Extraction
+  drawCheckbox(20, yPos, services.extraction);
+  pdf.text('Tooth Extraction', 28, yPos);
+  yPos += 8;
+  
+  // Others
+  drawCheckbox(20, yPos, services.others);
+  const othersText = services.others ? `Others: ${otherDetails}` : 'Others:';
+  pdf.text(othersText, 28, yPos);
+  yPos += 15;
+  
+  // Closing text
+  const closingText = 'This certification is issued upon the request of the above-named patient for whatever purpose it may serve.';
+  const splitClosing = pdf.splitTextToSize(closingText, 170);
+  pdf.text(splitClosing, 20, yPos);
+  
+  // Signatures
+  const signatureY = 240;
+  
+  // Signature lines
+  pdf.line(40, signatureY, 90, signatureY);
+  pdf.line(120, signatureY, 170, signatureY);
+  
+  // Doctor names
+  pdf.setFontSize(10);
+  pdf.text('Dr. Naomi Tanglao-Cortez', 65, signatureY + 8, { align: 'center' });
+  pdf.text('Dr. Adonis E. Cortez', 145, signatureY + 8, { align: 'center' });
+  
+  // PRC numbers
+  pdf.text('PRC # 40879', 65, signatureY + 15, { align: 'center' });
+  pdf.text('PRC # 37378', 145, signatureY + 15, { align: 'center' });
+  
+  // Download the PDF
+  const filename = `${patientName.replace(/\s+/g, '_')}_Dental_Certificate.pdf`;
+  pdf.save(filename);
 };
 
 export const generateCertificateData = (
