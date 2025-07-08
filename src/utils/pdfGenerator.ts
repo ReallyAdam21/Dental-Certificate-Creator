@@ -256,95 +256,94 @@ export const generateCertificatePDF = async (
   pdf.text('Tooth filling as indicated below:', 28, yPos);
   yPos += 10;
   
-  // Tooth grid (only if filling is selected)
+  // Tooth grid (show when filling is selected)
   if (services.filling) {
-    const upperTeeth = ["18", "17", "16", "15", "14", "13", "12", "11"];
-    const upperTeethRight = ["21", "22", "23", "24", "25", "26", "27", "28"];
-    const lowerTeeth = ["48", "47", "46", "45", "44", "43", "42", "41"];
-    const lowerTeethRight = ["31", "32", "33", "34", "35", "36", "37", "38"];
-    
-    // Set font for tooth numbers
     pdf.setFontSize(10);
+    pdf.setFont('times', 'normal');
+    
+    // Upper teeth: 18-11 : 21-28
+    const upperLeft = ["18", "17", "16", "15", "14", "13", "12", "11"];
+    const upperRight = ["21", "22", "23", "24", "25", "26", "27", "28"];
+    
+    // Lower teeth: 48-41 : 31-38  
+    const lowerLeft = ["48", "47", "46", "45", "44", "43", "42", "41"];
+    const lowerRight = ["31", "32", "33", "34", "35", "36", "37", "38"];
     
     // Draw upper teeth row
-    let xPos = 40;
-    upperTeeth.forEach(tooth => {
+    let startX = 35;
+    let currentX = startX;
+    
+    // Upper left teeth (18-11)
+    upperLeft.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
-        // Highlight selected teeth with background
-        pdf.setFillColor(198, 245, 198); // Light green
-        pdf.rect(xPos - 1, yPos - 4, 10, 6, 'F');
+        pdf.setFillColor(200, 255, 200); // Light green background
+        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
         pdf.setFont('times', 'bold');
-        pdf.setTextColor(0, 0, 0); // Black text
       } else {
         pdf.setFont('times', 'normal');
-        pdf.setTextColor(0, 0, 0); // Black text
       }
-      pdf.text(tooth, xPos + 4, yPos, { align: 'center' });
-      xPos += 12;
+      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
+      currentX += 16;
     });
     
-    // Add colon separator
+    // Colon separator
     pdf.setFont('times', 'normal');
-    pdf.text(':', xPos + 4, yPos, { align: 'center' });
-    xPos += 16;
+    pdf.text(':', currentX + 2, yPos);
+    currentX += 12;
     
-    // Draw upper right teeth
-    upperTeethRight.forEach(tooth => {
+    // Upper right teeth (21-28)
+    upperRight.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
-        // Highlight selected teeth with background
-        pdf.setFillColor(198, 245, 198); // Light green
-        pdf.rect(xPos - 1, yPos - 4, 10, 6, 'F');
+        pdf.setFillColor(200, 255, 200); // Light green background
+        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
         pdf.setFont('times', 'bold');
-        pdf.setTextColor(0, 0, 0); // Black text
       } else {
         pdf.setFont('times', 'normal');
-        pdf.setTextColor(0, 0, 0); // Black text
       }
-      pdf.text(tooth, xPos + 4, yPos, { align: 'center' });
-      xPos += 12;
+      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
+      currentX += 16;
     });
     
-    yPos += 10;
+    yPos += 12;
     
     // Draw lower teeth row
-    xPos = 40;
-    lowerTeeth.forEach(tooth => {
+    currentX = startX;
+    
+    // Lower left teeth (48-41)
+    lowerLeft.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
-        // Highlight selected teeth with background
-        pdf.setFillColor(198, 245, 198); // Light green
-        pdf.rect(xPos - 1, yPos - 4, 10, 6, 'F');
+        pdf.setFillColor(200, 255, 200); // Light green background
+        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
         pdf.setFont('times', 'bold');
-        pdf.setTextColor(0, 0, 0); // Black text
       } else {
         pdf.setFont('times', 'normal');
-        pdf.setTextColor(0, 0, 0); // Black text
       }
-      pdf.text(tooth, xPos + 4, yPos, { align: 'center' });
-      xPos += 12;
+      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
+      currentX += 16;
     });
     
-    // Add colon separator
+    // Colon separator
     pdf.setFont('times', 'normal');
-    pdf.text(':', xPos + 4, yPos, { align: 'center' });
-    xPos += 16;
+    pdf.text(':', currentX + 2, yPos);
+    currentX += 12;
     
-    // Draw lower right teeth
-    lowerTeethRight.forEach(tooth => {
+    // Lower right teeth (31-38)
+    lowerRight.forEach(tooth => {
       if (selectedTeeth.has(tooth)) {
-        // Highlight selected teeth with background
-        pdf.setFillColor(198, 245, 198); // Light green
-        pdf.rect(xPos - 1, yPos - 4, 10, 6, 'F');
+        pdf.setFillColor(200, 255, 200); // Light green background
+        pdf.rect(currentX - 2, yPos - 4, 14, 7, 'F');
         pdf.setFont('times', 'bold');
-        pdf.setTextColor(0, 0, 0); // Black text
       } else {
         pdf.setFont('times', 'normal');
-        pdf.setTextColor(0, 0, 0); // Black text
       }
-      pdf.text(tooth, xPos + 4, yPos, { align: 'center' });
-      xPos += 12;
+      pdf.text(tooth, currentX + 5, yPos, { align: 'center' });
+      currentX += 16;
     });
     
-    yPos += 15;
+    yPos += 20;
+  } else {
+    // Add some spacing even if no tooth grid
+    yPos += 5;
   }
   
   // Reset font
