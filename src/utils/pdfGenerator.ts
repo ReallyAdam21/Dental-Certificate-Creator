@@ -192,54 +192,57 @@ export const generateCertificatePDF = async (
   otherDetails: string,
   selectedTeeth: Set<string>
 ) => {
-  // Replace template variables
-  let html = htmlTemplate
-    .replace('{{ date }}', date)
-    .replace('{{ patient_name }}', patientName)
-    .replace('{% if scaling %}✔{% endif %}', services.scaling ? '✔' : '')
-    .replace('{% if filling %}✔{% endif %}', services.filling ? '✔' : '')
-    .replace('{% if gingival %}✔{% endif %}', services.gingival ? '✔' : '')
-    .replace('{% if extraction %}✔{% endif %}', services.extraction ? '✔' : '')
-    .replace('{% if others %}✔{% endif %}', services.others ? '✔' : '')
-    .replace('{{ other_details }}', services.others ? otherDetails : '');
-
-  // Handle tooth grid conditional display and loops
+  // Convert Jinja template to simple replaceable format
+  let processedHtml = htmlTemplate;
+  
+  // First handle the conditional tooth grid section
   if (services.filling) {
     const upperTeeth = ["18", "17", "16", "15", "14", "13", "12", "11"];
     const upperTeethRight = ["21", "22", "23", "24", "25", "26", "27", "28"];
     const lowerTeeth = ["48", "47", "46", "45", "44", "43", "42", "41"];
     const lowerTeethRight = ["31", "32", "33", "34", "35", "36", "37", "38"];
 
-    // Generate upper row
-    const upperRowHtml = upperTeeth.map(tooth => 
-      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
-    ).join('');
+    const toothGridHtml = `
+        <div class="tooth-grid">
+            <!-- Upper Row -->
+            ${upperTeeth.map(tooth => 
+              `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+            ).join('')}
+            <span style="margin: 0 12px;">:</span>
+            ${upperTeethRight.map(tooth => 
+              `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+            ).join('')}
+            <br>
+            <!-- Lower Row -->
+            ${lowerTeeth.map(tooth => 
+              `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+            ).join('')}
+            <span style="margin: 0 12px;">:</span>
+            ${lowerTeethRight.map(tooth => 
+              `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
+            ).join('')}
+        </div>`;
     
-    const upperRightRowHtml = upperTeethRight.map(tooth => 
-      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
-    ).join('');
-
-    // Generate lower row
-    const lowerRowHtml = lowerTeeth.map(tooth => 
-      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
-    ).join('');
-    
-    const lowerRightRowHtml = lowerTeethRight.map(tooth => 
-      `<span class="tooth-number ${selectedTeeth.has(tooth) ? 'highlight' : ''}">${tooth}</span>`
-    ).join('');
-
-    // Replace the Jinja loops with actual HTML
-    html = html
-      .replace('{% if filling %}', '')
-      .replace('{% endif %}', '')
-      .replace(/{% for tooth in \["18","17","16","15","14","13","12","11"\] %}[\s\S]*?{% endfor %}/g, upperRowHtml)
-      .replace(/{% for tooth in \["21","22","23","24","25","26","27","28"\] %}[\s\S]*?{% endfor %}/g, upperRightRowHtml)
-      .replace(/{% for tooth in \["48","47","46","45","44","43","42","41"\] %}[\s\S]*?{% endfor %}/g, lowerRowHtml)
-      .replace(/{% for tooth in \["31","32","33","34","35","36","37","38"\] %}[\s\S]*?{% endfor %}/g, lowerRightRowHtml);
+    // Replace the entire conditional block with the generated HTML
+    processedHtml = processedHtml.replace(
+      /{% if filling %}[\s\S]*?{% endif %}/g, 
+      toothGridHtml
+    );
   } else {
-    // Remove the entire tooth grid section if filling is not selected
-    html = html.replace(/{% if filling %}[\s\S]*?{% endif %}/g, '');
+    // Remove the tooth grid section completely
+    processedHtml = processedHtml.replace(/{% if filling %}[\s\S]*?{% endif %}/g, '');
   }
+
+  // Now replace all the simple variables and checkboxes
+  let html = processedHtml
+    .replace(/{{ date }}/g, date)
+    .replace(/{{ patient_name }}/g, patientName)
+    .replace(/{% if scaling %}✔{% endif %}/g, services.scaling ? '✔' : '')
+    .replace(/{% if filling %}✔{% endif %}/g, services.filling ? '✔' : '')
+    .replace(/{% if gingival %}✔{% endif %}/g, services.gingival ? '✔' : '')
+    .replace(/{% if extraction %}✔{% endif %}/g, services.extraction ? '✔' : '')
+    .replace(/{% if others %}✔{% endif %}/g, services.others ? '✔' : '')
+    .replace(/{{ other_details }}/g, services.others ? otherDetails : '');
 
   // Create a temporary div to render the HTML
   const tempDiv = document.createElement('div');
