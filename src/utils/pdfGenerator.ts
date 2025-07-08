@@ -100,18 +100,38 @@ const htmlTemplate = `<!DOCTYPE html>
     </div>
 
     <div class="section">
-        <strong>Date:</strong> <strong>{{DATE}}</strong>
+        <strong>Date:</strong> <strong>{{ date }}</strong>
         <p>To Whom It May Concern:</p>
-        <p>This is to certify that Mr./Ms. <strong>{{PATIENT_NAME}}</strong> has undergone dental treatment and received the following services:</p>
+        <p>This is to certify that Mr./Ms. <strong>{{ patient_name }}</strong> has undergone dental treatment and received the following services:</p>
 
-        <p><span class="checkbox">{{SCALING_CHECK}}</span> Thorough scaling and polishing</p>
-        <p><span class="checkbox">{{FILLING_CHECK}}</span> Tooth filling as indicated below:</p>
+        <p><span class="checkbox">{% if scaling %}✔{% endif %}</span> Thorough scaling and polishing</p>
+        <p><span class="checkbox">{% if filling %}✔{% endif %}</span> Tooth filling as indicated below:</p>
 
-        {{TOOTH_GRID}}
+        {% if filling %}
+        <div class="tooth-grid">
+            <!-- Upper Row -->
+            {% for tooth in ["18","17","16","15","14","13","12","11"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+            <span style="margin: 0 12px;">:</span>
+            {% for tooth in ["21","22","23","24","25","26","27","28"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+            <br>
+            <!-- Lower Row -->
+            {% for tooth in ["48","47","46","45","44","43","42","41"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+            <span style="margin: 0 12px;">:</span>
+            {% for tooth in ["31","32","33","34","35","36","37","38"] %}
+                <span class="tooth-number {% if tooth in selected_teeth %}highlight{% endif %}">{{ tooth }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
 
-        <p><span class="checkbox">{{GINGIVAL_CHECK}}</span> Gingival / Periodontal Treatment</p>
-        <p><span class="checkbox">{{EXTRACTION_CHECK}}</span> Tooth Extraction</p>
-        <p><span class="checkbox">{{OTHERS_CHECK}}</span> Others: <strong><em>{{OTHER_DETAILS}}</em></strong></p>
+        <p><span class="checkbox">{% if gingival %}✔{% endif %}</span> Gingival / Periodontal Treatment</p>
+        <p><span class="checkbox">{% if extraction %}✔{% endif %}</span> Tooth Extraction</p>
+        <p><span class="checkbox">{% if others %}✔{% endif %}</span> Others: <strong><em>{{ other_details }}</em></strong></p>
 
         <p>This certification is issued upon the request of the above-named patient for whatever purpose it may serve.</p>
         <br><br><br><br><br><br><br><br>
@@ -172,17 +192,50 @@ export const generateCertificatePDF = async (
   otherDetails: string,
   selectedTeeth: Set<string>
 ) => {
-  // Replace template variables with actual values
-  let html = htmlTemplate
-    .replace('{{DATE}}', date)
-    .replace('{{PATIENT_NAME}}', patientName)
-    .replace('{{SCALING_CHECK}}', services.scaling ? '✔' : '')
-    .replace('{{FILLING_CHECK}}', services.filling ? '✔' : '')
-    .replace('{{GINGIVAL_CHECK}}', services.gingival ? '✔' : '')
-    .replace('{{EXTRACTION_CHECK}}', services.extraction ? '✔' : '')
-    .replace('{{OTHERS_CHECK}}', services.others ? '✔' : '')
-    .replace('{{OTHER_DETAILS}}', services.others ? otherDetails : '')
-    .replace('{{TOOTH_GRID}}', generateToothGrid(selectedTeeth, services.filling));
+  // Process the Jinja-style template
+  let html = htmlTemplate;
+  
+  // Replace simple variables first
+  html = html.replace(/{{ date }}/g, date);
+  html = html.replace(/{{ patient_name }}/g, patientName);
+  html = html.replace(/{{ other_details }}/g, services.others ? otherDetails : '');
+  
+  // Process conditional checkboxes
+  html = html.replace(/{% if scaling %}✔{% endif %}/g, services.scaling ? '✔' : '');
+  html = html.replace(/{% if filling %}✔{% endif %}/g, services.filling ? '✔' : '');
+  html = html.replace(/{% if gingival %}✔{% endif %}/g, services.gingival ? '✔' : '');
+  html = html.replace(/{% if extraction %}✔{% endif %}/g, services.extraction ? '✔' : '');
+  html = html.replace(/{% if others %}✔{% endif %}/g, services.others ? '✔' : '');
+  
+  // Process the conditional tooth grid block
+  if (services.filling) {
+    // Process each for loop in the tooth grid
+    const teethArrays = [
+      ["18","17","16","15","14","13","12","11"],
+      ["21","22","23","24","25","26","27","28"],
+      ["48","47","46","45","44","43","42","41"],
+      ["31","32","33","34","35","36","37","38"]
+    ];
+    
+    teethArrays.forEach(teethArray => {
+      const teethPattern = teethArray.map(t => `"${t}"`).join(',');
+      const forLoopRegex = new RegExp(`{% for tooth in \\[${teethPattern}\\] %}[\\s\\S]*?{% endfor %}`, 'g');
+      
+      const replacement = teethArray.map(tooth => {
+        const highlightClass = selectedTeeth.has(tooth) ? ' highlight' : '';
+        return `<span class="tooth-number${highlightClass}">${tooth}</span>`;
+      }).join('');
+      
+      html = html.replace(forLoopRegex, replacement);
+    });
+    
+    // Remove the conditional filling wrapper
+    html = html.replace(/{% if filling %}/g, '');
+    html = html.replace(/{% endif %}/g, '');
+  } else {
+    // Remove the entire tooth grid section if filling is not selected
+    html = html.replace(/{% if filling %}[\s\S]*?{% endif %}/g, '');
+  }
 
   // Create a temporary div to render the HTML
   const tempDiv = document.createElement('div');
