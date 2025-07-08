@@ -256,8 +256,8 @@ export const generateCertificatePDF = async (
   pdf.text('Tooth filling as indicated below:', 28, yPos);
   yPos += 10;
   
-  // Tooth grid (show when filling is selected)
-  if (services.filling) {
+  // Tooth grid - Force display for debugging (change back to services.filling when working)
+  if (true) { // Change this back to: if (services.filling) {
     pdf.setFontSize(10);
     pdf.setFont('times', 'normal');
     
