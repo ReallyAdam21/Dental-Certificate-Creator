@@ -402,14 +402,16 @@ export const generateCertificatePDF = async (
   pdf.line(40, signatureY, 90, signatureY);
   pdf.line(120, signatureY, 170, signatureY);
   
-  // Doctor names
-  pdf.setFontSize(10);
+  // Doctor names - Make bigger
+  pdf.setFontSize(12); // Increased from 10
+  pdf.setFont('times', 'normal');
   pdf.text('Dr. Naomi Tanglao-Cortez', 65, signatureY + 8, { align: 'center' });
   pdf.text('Dr. Adonis E. Cortez', 145, signatureY + 8, { align: 'center' });
   
-  // PRC numbers
-  pdf.text('PRC # 40879', 65, signatureY + 15, { align: 'center' });
-  pdf.text('PRC # 37378', 145, signatureY + 15, { align: 'center' });
+  // PRC numbers - Make bigger
+  pdf.setFontSize(11); // Increased from 10
+  pdf.text('PRC # 40879', 65, signatureY + 16, { align: 'center' });
+  pdf.text('PRC # 37378', 145, signatureY + 16, { align: 'center' });
   
   // Download the PDF
   const filename = `${patientName.replace(/\s+/g, '_')}_Dental_Certificate.pdf`;
