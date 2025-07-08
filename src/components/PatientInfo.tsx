@@ -3,6 +3,12 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PatientInfoProps {
   patientName: string;
@@ -17,6 +23,26 @@ const PatientInfo: React.FC<PatientInfoProps> = ({
   date,
   setDate
 }) => {
+  const [selectedDate, setSelectedDate] = React.useState<Date>();
+
+  const handleNameChange = (value: string) => {
+    // Capitalize first letter of each word
+    const capitalizedName = value
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+    setPatientName(capitalizedName);
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      // Format date as "Month Day, Year" to match the certificate format
+      const formattedDate = format(date, 'MMMM d, yyyy');
+      setDate(formattedDate);
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -38,7 +64,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({
               type="text"
               placeholder="Enter patient's full name"
               value={patientName}
-              onChange={(e) => setPatientName(e.target.value)}
+              onChange={(e) => handleNameChange(e.target.value)}
               className="w-full"
             />
           </div>
@@ -46,15 +72,30 @@ const PatientInfo: React.FC<PatientInfoProps> = ({
             <Label htmlFor="date" className="text-sm font-medium text-gray-700">
               Date
             </Label>
-            <Input
-              id="date"
-              type="text"
-              placeholder="e.g., July 8, 2025"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full"
-            />
-            <p className="text-xs text-gray-500">Format: Month Day, Year</p>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !selectedDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Select date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+            <p className="text-xs text-gray-500">Select the treatment date</p>
           </div>
         </div>
       </CardContent>
