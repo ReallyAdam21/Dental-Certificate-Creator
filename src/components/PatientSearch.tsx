@@ -41,14 +41,12 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
         console.log('Searching for:', searchQuery);
         
         const trimmedQuery = searchQuery.trim();
-        let query = supabase
+        
+        const { data, error } = await supabase
           .from('patients')
-          .select('id, name, first_name, last_name, phone, email, date_of_birth');
-        
-        // Search in first_name, last_name, and name fields (trimmed for spaces)
-        query = query.or(`first_name.ilike.%${trimmedQuery}%,last_name.ilike.%${trimmedQuery}%,name.ilike.%${trimmedQuery}%`);
-        
-        const { data, error } = await query.limit(10);
+          .select('id, name, first_name, last_name, phone, email, date_of_birth')
+          .or(`first_name.ilike.%${trimmedQuery}%,last_name.ilike.%${trimmedQuery}%,name.ilike.%${trimmedQuery}%`)
+          .limit(10);
 
         console.log('Search results:', data);
         console.log('Search error:', error);
