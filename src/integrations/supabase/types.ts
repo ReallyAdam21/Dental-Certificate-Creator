@@ -55,7 +55,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_patients: {
+        Args: { search_term: string }
+        Returns: {
+          id: string
+          name: string
+          title: string
+          phone: string
+          email: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
