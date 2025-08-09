@@ -56,53 +56,19 @@ const PatientInfo: React.FC<PatientInfoProps> = ({
   };
 
   const handlePatientSelect = (patient: any) => {
-    setPatientName(patient.name);
-    setTitle(patient.title || 'Mr.');
+    setPatientName(patient.name || `${patient.first_name} ${patient.last_name}`);
+    setTitle('Mr.'); // Default title since it's not stored in the database
     setSelectedPatientId(patient.id);
     setActiveTab('manual');
     toast({
       title: "Patient Selected",
-      description: `Selected patient: ${patient.title} ${patient.name}`,
+      description: `Selected patient: ${patient.name || `${patient.first_name} ${patient.last_name}`}`,
     });
   };
 
   const handleNewPatient = () => {
     setActiveTab('manual');
     setSelectedPatientId(null);
-  };
-
-  const saveNewPatient = async () => {
-    if (!patientName.trim() || !title) {
-      toast({
-        title: "Incomplete Information",
-        description: "Please fill in patient name and title.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('patients')
-        .insert([{ name: patientName, title }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setSelectedPatientId(data.id);
-      toast({
-        title: "Patient Saved",
-        description: "New patient has been saved to the database.",
-      });
-    } catch (error) {
-      console.error('Error saving patient:', error);
-      toast({
-        title: "Save Error",
-        description: "Failed to save patient. Please try again.",
-        variant: "destructive",
-      });
-    }
   };
 
   return (
@@ -164,16 +130,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({
                     onChange={(e) => handleNameChange(e.target.value)}
                     className="flex-1"
                   />
-                  {!selectedPatientId && patientName && title && (
-                    <Button 
-                      onClick={saveNewPatient}
-                      variant="outline"
-                      size="sm"
-                      className="whitespace-nowrap"
-                    >
-                      Save Patient
-                    </Button>
-                  )}
                 </div>
               </div>
               <div className="space-y-2">
