@@ -14,42 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      patients: {
-        Row: {
-          address: string | null
-          created_at: string
-          date_of_birth: string | null
-          email: string | null
-          id: string
-          name: string
-          phone: string | null
-          title: string | null
-          updated_at: string
-        }
-        Insert: {
-          address?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          email?: string | null
-          id?: string
-          name: string
-          phone?: string | null
-          title?: string | null
-          updated_at?: string
-        }
-        Update: {
-          address?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          email?: string | null
-          id?: string
-          name?: string
-          phone?: string | null
-          title?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
