@@ -14,22 +14,363 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          appointment_datetime: string
+          created_at: string
+          dentist_id: string
+          id: string
+          notes: string | null
+          patient_id: string
+          service_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          appointment_datetime: string
+          created_at?: string
+          dentist_id: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          service_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          appointment_datetime?: string
+          created_at?: string
+          dentist_id?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          service_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_dentist_id_fkey"
+            columns: ["dentist_id"]
+            isOneToOne: false
+            referencedRelation: "dentists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dentists: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          license_number: string | null
+          phone: string | null
+          specialization: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          license_number?: string | null
+          phone?: string | null
+          specialization?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          license_number?: string | null
+          phone?: string | null
+          specialization?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      medical_history: {
+        Row: {
+          allergies: Json | null
+          bleeding_time: string | null
+          blood_pressure: string | null
+          blood_type: string | null
+          created_at: string
+          hospitalization_details: string | null
+          hospitalized: string | null
+          id: string
+          illness_description: string | null
+          in_good_health: string | null
+          in_medical_treatment: string | null
+          is_nursing: string | null
+          is_pregnant: string | null
+          medical_conditions: Json | null
+          medication_details: string | null
+          other_allergy: string | null
+          patient_id: string
+          physician_address: string | null
+          physician_name: string | null
+          physician_phone: string | null
+          physician_specialty: string | null
+          serious_illness: string | null
+          taking_birth_control: string | null
+          taking_medication: string | null
+          treatment_condition: string | null
+          updated_at: string
+          uses_alcohol_drugs: string | null
+          uses_tobacco: string | null
+        }
+        Insert: {
+          allergies?: Json | null
+          bleeding_time?: string | null
+          blood_pressure?: string | null
+          blood_type?: string | null
+          created_at?: string
+          hospitalization_details?: string | null
+          hospitalized?: string | null
+          id?: string
+          illness_description?: string | null
+          in_good_health?: string | null
+          in_medical_treatment?: string | null
+          is_nursing?: string | null
+          is_pregnant?: string | null
+          medical_conditions?: Json | null
+          medication_details?: string | null
+          other_allergy?: string | null
+          patient_id: string
+          physician_address?: string | null
+          physician_name?: string | null
+          physician_phone?: string | null
+          physician_specialty?: string | null
+          serious_illness?: string | null
+          taking_birth_control?: string | null
+          taking_medication?: string | null
+          treatment_condition?: string | null
+          updated_at?: string
+          uses_alcohol_drugs?: string | null
+          uses_tobacco?: string | null
+        }
+        Update: {
+          allergies?: Json | null
+          bleeding_time?: string | null
+          blood_pressure?: string | null
+          blood_type?: string | null
+          created_at?: string
+          hospitalization_details?: string | null
+          hospitalized?: string | null
+          id?: string
+          illness_description?: string | null
+          in_good_health?: string | null
+          in_medical_treatment?: string | null
+          is_nursing?: string | null
+          is_pregnant?: string | null
+          medical_conditions?: Json | null
+          medication_details?: string | null
+          other_allergy?: string | null
+          patient_id?: string
+          physician_address?: string | null
+          physician_name?: string | null
+          physician_phone?: string | null
+          physician_specialty?: string | null
+          serious_illness?: string | null
+          taking_birth_control?: string | null
+          taking_medication?: string | null
+          treatment_condition?: string | null
+          updated_at?: string
+          uses_alcohol_drugs?: string | null
+          uses_tobacco?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          address: string | null
+          age: number | null
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          first_name: string
+          gender: string | null
+          id: string
+          insurance_policy_number: string | null
+          insurance_provider: string | null
+          last_name: string
+          marital_status: string | null
+          medical_history: string | null
+          name: string | null
+          occupation: string | null
+          phone: string
+          updated_at: string
+          xray_images: string[] | null
+        }
+        Insert: {
+          address?: string | null
+          age?: number | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name: string
+          gender?: string | null
+          id?: string
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          last_name: string
+          marital_status?: string | null
+          medical_history?: string | null
+          name?: string | null
+          occupation?: string | null
+          phone: string
+          updated_at?: string
+          xray_images?: string[] | null
+        }
+        Update: {
+          address?: string | null
+          age?: number | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          first_name?: string
+          gender?: string | null
+          id?: string
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          last_name?: string
+          marital_status?: string | null
+          medical_history?: string | null
+          name?: string | null
+          occupation?: string | null
+          phone?: string
+          updated_at?: string
+          xray_images?: string[] | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          patient_id: string
+          payment_date: string
+          payment_method: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          patient_id: string
+          payment_date: string
+          payment_method: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          patient_id?: string
+          payment_date?: string
+          payment_method?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visits: {
+        Row: {
+          created_at: string
+          diagnosis: string
+          id: string
+          notes: string | null
+          patient_id: string
+          treatment: string
+          treatment_cost: number | null
+          updated_at: string
+          visit_date: string
+          xray_images: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          diagnosis: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          treatment: string
+          treatment_cost?: number | null
+          updated_at?: string
+          visit_date: string
+          xray_images?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          diagnosis?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          treatment?: string
+          treatment_cost?: number | null
+          updated_at?: string
+          visit_date?: string
+          xray_images?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visits_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      search_patients: {
-        Args: { search_term: string }
-        Returns: {
-          id: string
-          name: string
-          title: string
-          phone: string
-          email: string
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
