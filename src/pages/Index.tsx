@@ -1,8 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, Download, Stethoscope } from 'lucide-react';
+import { FileText, Download, Stethoscope, LogOut, User } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { useNavigate } from 'react-router-dom';
 import PatientInfo from '@/components/PatientInfo';
 import ServiceSelection from '@/components/ServiceSelection';
 import ToothSelector from '@/components/ToothSelector';
@@ -11,6 +13,41 @@ import { generateCertificatePDF } from '@/utils/pdfGenerator';
 
 const Index = () => {
   const { toast } = useToast();
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated
+  if (!user) {
+    return null;
+  }
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been signed out successfully.",
+    });
+    navigate('/auth');
+  };
   const [patientName, setPatientName] = useState('');
   const [title, setTitle] = useState('Mr.');
   const [date, setDate] = useState('');
@@ -67,19 +104,37 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-blue-100">
+      <header className="bg-card shadow-sm border-b border-border">
         <div className="container mx-auto px-4 py-4 md:py-6">
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <div className="p-2 bg-blue-600 rounded-lg">
-              <Stethoscope className="w-6 h-6 md:w-8 md:h-8 text-white" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary rounded-lg">
+                <Stethoscope className="w-6 h-6 md:w-8 md:h-8 text-primary-foreground" />
+              </div>
+              <div className="text-center sm:text-left">
+                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-primary">
+                  Dental Certificate Generator
+                </h1>
+                <p className="text-muted-foreground text-sm md:text-base">
+                  Create professional dental certificates with ease
+                </p>
+              </div>
             </div>
-            <div className="text-center sm:text-left">
-              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-blue-900">
-                Dental Certificate Generator
-              </h1>
-              <p className="text-blue-600 text-sm md:text-base">
-                Create professional dental certificates with ease
-              </p>
+            
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="w-4 h-4" />
+                <span>{user.email}</span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSignOut}
+                className="gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </div>
