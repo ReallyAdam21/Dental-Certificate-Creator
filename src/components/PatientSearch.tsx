@@ -42,10 +42,11 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
         
         const trimmedQuery = searchQuery.trim();
         
+        // Try a simple direct query first to test authentication
         const { data, error } = await supabase
           .from('patients')
           .select('id, name, first_name, last_name, phone, email, date_of_birth')
-          .or(`first_name.ilike.%${trimmedQuery}%,last_name.ilike.%${trimmedQuery}%,name.ilike.%${trimmedQuery}%`)
+          .ilike('first_name', `%${trimmedQuery}%`)
           .limit(10);
 
         console.log('Search results:', data);
