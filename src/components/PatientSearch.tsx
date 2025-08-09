@@ -40,6 +40,18 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
       try {
         console.log('Searching for:', searchQuery);
         
+        // Check authentication status
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log('Current user:', user);
+        
+        // First try to get all patients to test connection
+        const { data: allPatients, error: allError } = await supabase
+          .from('patients')
+          .select('id, name, first_name, last_name')
+          .limit(5);
+        
+        console.log('All patients test:', allPatients, allError);
+        
         const trimmedQuery = searchQuery.trim();
         
         // Try a simple direct query first to test authentication
