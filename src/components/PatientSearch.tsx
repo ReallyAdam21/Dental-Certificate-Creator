@@ -40,8 +40,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
       try {
         const { data, error } = await supabase
           .from('patients')
-          .select('id, name, first_name, last_name, phone, email, date_of_birth, age, address')
-          .or(`name.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+          .select('id, name, first_name, last_name, phone, email, date_of_birth')
+          .or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,name.ilike.%${searchQuery}%`)
           .limit(10);
 
         if (error) throw error;
@@ -107,20 +107,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
 
       {searchQuery && !isSearching && searchResults.length === 0 && (
         <div className="text-center py-6">
-          <p className="text-gray-500 mb-3">No patients found matching "{searchQuery}"</p>
-          <Button onClick={onNewPatient} variant="outline" className="gap-2">
-            <Plus className="w-4 h-4" />
-            Add as New Patient
-          </Button>
-        </div>
-      )}
-
-      {!searchQuery && (
-        <div className="text-center py-4">
-          <Button onClick={onNewPatient} variant="outline" className="gap-2">
-            <Plus className="w-4 h-4" />
-            Add New Patient
-          </Button>
+          <p className="text-gray-500">No patients found matching "{searchQuery}"</p>
         </div>
       )}
     </div>
