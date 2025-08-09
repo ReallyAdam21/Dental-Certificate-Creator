@@ -13,6 +13,9 @@ interface Patient {
   last_name?: string;
   phone?: string;
   email?: string;
+  date_of_birth?: string;
+  age?: number;
+  address?: string;
 }
 
 interface PatientSearchProps {
@@ -37,8 +40,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
       try {
         const { data, error } = await supabase
           .from('patients')
-          .select('id, name, first_name, last_name, phone, email')
-          .or(`name.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
+          .select('id, name, first_name, last_name, phone, email, date_of_birth, age, address')
+          .or(`name.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
           .limit(10);
 
         if (error) throw error;
@@ -87,11 +90,13 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
                   </div>
                   <div>
                     <p className="font-medium">
-                      {patient.name || `${patient.first_name} ${patient.last_name}`}
+                      {patient.name || `${patient.first_name || ''} ${patient.last_name || ''}`.trim()}
                     </p>
-                    {patient.email && (
-                      <p className="text-sm text-gray-500">{patient.email}</p>
-                    )}
+                    <div className="text-sm text-gray-500 space-y-1">
+                      {patient.email && <p>{patient.email}</p>}
+                      {patient.phone && <p>{patient.phone}</p>}
+                      {patient.date_of_birth && <p>DOB: {new Date(patient.date_of_birth).toLocaleDateString()}</p>}
+                    </div>
                   </div>
                 </div>
               </div>
