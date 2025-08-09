@@ -8,8 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Patient {
   id: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   title?: string;
   phone?: string;
   email?: string;
@@ -37,8 +36,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
       try {
         const { data, error } = await supabase
           .from('patients')
-          .select('id, first_name, last_name, title, phone, email')
-          .or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
+          .select('id, name, title, phone, email')
+          .ilike('name', `%${searchQuery}%`)
           .limit(10);
 
         if (error) {
@@ -89,7 +88,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
                   </div>
                   <div>
                     <p className="font-medium">
-                      {patient.title} {patient.first_name} {patient.last_name}
+                      {patient.title} {patient.name}
                     </p>
                     {patient.email && (
                       <p className="text-sm text-gray-500">{patient.email}</p>
