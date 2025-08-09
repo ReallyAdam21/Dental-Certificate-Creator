@@ -35,7 +35,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
       setIsSearching(true);
       try {
         const { data, error } = await supabase
-          .from('public.patients' as any)
+          .from('patients')
           .select('id, name, title, phone, email')
           .ilike('name', `%${searchQuery}%`)
           .limit(10);
