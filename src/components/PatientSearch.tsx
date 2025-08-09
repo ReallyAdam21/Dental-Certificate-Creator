@@ -35,14 +35,14 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
       setIsSearching(true);
       try {
         const { data, error } = await supabase
-          .from('patients')
+          .from('public.patients' as any)
           .select('id, name, title, phone, email')
           .ilike('name', `%${searchQuery}%`)
           .limit(10);
 
         if (error) throw error;
 
-        setSearchResults(data || []);
+        setSearchResults((data as unknown as Patient[]) || []);
       } catch (error) {
         console.error('Search error:', error);
         toast({
