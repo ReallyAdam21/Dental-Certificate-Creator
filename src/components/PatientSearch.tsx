@@ -37,7 +37,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ onPatientSelect, onNewPat
         const { data, error } = await supabase
           .rpc('search_patients', {
             search_term: searchQuery
-          });
+          }) as { data: Patient[] | null; error: any };
 
         if (error) throw error;
 
